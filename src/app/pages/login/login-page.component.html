@@ -1,0 +1,63 @@
+<main class="login-shell">
+  <div class="login-glow glow-left" aria-hidden="true"></div>
+  <div class="login-glow glow-right" aria-hidden="true"></div>
+
+  <section class="login-layout">
+    <article class="login-info">
+      <a class="brand-link" href="/">Grupo Cordillera</a>
+      <span class="eyebrow">Acceso interno</span>
+      <h1>Inicia sesion con tu cuenta corporativa</h1>
+
+      <ul class="info-points">
+        <li>Usa tu cuenta de Microsoft corporativa asignada por administracion.</li>
+        <li>El acceso esta restringido a cuentas del tenant de Grupo Cordillera.</li>
+      </ul>
+
+      <div class="info-card">
+        <small>
+          Seras redirigido al inicio de sesion de Microsoft.
+          Una vez autenticado volveras al dashboard automaticamente.
+        </small>
+      </div>
+    </article>
+
+    <article class="login-card">
+      <div class="card-header">
+        <span class="card-kicker">Autenticacion</span>
+        <h2>Bienvenido de vuelta</h2>
+        <p>Inicia sesion con tu cuenta Microsoft corporativa para acceder al sistema.</p>
+      </div>
+
+      <p class="feedback feedback-error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </p>
+
+      <div class="actions">
+        <button
+          id="btn-login-microsoft"
+          class="button button-microsoft"
+          type="button"
+          [disabled]="isLoggingIn()"
+          (click)="loginWithMicrosoft()"
+        >
+          <svg
+            class="ms-logo"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 21 21"
+            aria-hidden="true"
+          >
+            <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+          </svg>
+          {{ isLoggingIn() ? 'Redirigiendo...' : 'Iniciar sesion con Microsoft' }}
+        </button>
+
+        <a class="button button-secondary" href="/">
+          Volver al inicio
+        </a>
+      </div>
+    </article>
+  </section>
+</main>

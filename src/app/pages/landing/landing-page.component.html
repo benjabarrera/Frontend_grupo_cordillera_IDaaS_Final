@@ -1,0 +1,252 @@
+<main class="landing-shell" [class.theme-light]="theme() === 'light'">
+  <div class="background-grid" aria-hidden="true"></div>
+  <div class="background-glow glow-left" aria-hidden="true"></div>
+  <div class="background-glow glow-right" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Grupo Cordillera">
+      <span class="brand-mark"></span>
+      <span class="brand-copy">
+        <strong>Grupo Cordillera</strong>
+        <small>Plataforma de monitoreo ejecutivo</small>
+      </span>
+    </a>
+
+    <div class="topbar-controls">
+      <button
+        class="theme-toggle theme-toggle-compact"
+        type="button"
+        [attr.aria-pressed]="theme() === 'light'"
+        [attr.aria-label]="theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        (click)="toggleTheme()"
+      >
+        {{ themeIcon() }}
+      </button>
+
+      <button
+        class="mobile-menu-toggle"
+        type="button"
+        [attr.aria-expanded]="isMobileMenuOpen()"
+        aria-controls="main-navigation"
+        aria-label="Abrir menu de navegacion"
+        (click)="toggleMobileMenu()"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <nav
+      class="topbar-actions"
+      id="main-navigation"
+      aria-label="Navegacion principal"
+      [class.topbar-actions-open]="isMobileMenuOpen()"
+    >
+      <a class="nav-link" href="#modulos" (click)="closeMobileMenu()">Modulos</a>
+      <a class="nav-link" href="#kpis" (click)="closeMobileMenu()">KPIs</a>
+      <a class="nav-link" routerLink="/login" (click)="closeMobileMenu()">Iniciar sesion</a>
+      <a class="button button-secondary" routerLink="/registro" (click)="closeMobileMenu()">
+        Solicitar acceso
+      </a>
+    </nav>
+  </header>
+
+  <section class="hero" id="inicio">
+    <div class="hero-copy reveal reveal-delay-1">
+      <span class="hero-badge">Sistema interno v1.0</span>
+      <h1 class="hero-title">
+        Monitoreo inteligente para
+        <span>Grupo Cordillera</span>
+      </h1>
+      <p class="hero-description">
+        Ventas centralizadas, inventario y operacion en un solo tablero para tomar
+        decisiones con datos claros, alertas tempranas y seguimiento en tiempo real.
+      </p>
+
+      <div class="hero-actions">
+        <a class="button button-primary" routerLink="/login">Acceder al sistema</a>
+        <a class="button button-ghost" routerLink="/registro">Solicitar acceso</a>
+      </div>
+
+      <ul class="hero-points" aria-label="Beneficios principales">
+        <li>Visibilidad unificada de sucursales y procesos clave.</li>
+        <li>Alertas operativas para reaccionar antes del impacto.</li>
+        <li>Indicadores listos para direccion y equipos de gestion.</li>
+      </ul>
+    </div>
+
+    <div class="hero-panel reveal reveal-delay-2" aria-label="Vista previa del sistema">
+      <div class="panel-card panel-card-main">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Preview de interfaz</p>
+            <h2>Dashboard de Metabase</h2>
+          </div>
+          <span class="status-pill" [class.status-pill-live]="metabaseConfigured">
+            {{ metabaseConfigured ? 'Metabase conectado' : 'Pendiente de URL' }}
+          </span>
+        </div>
+
+        <div class="metric-strip">
+          <article>
+            <strong>DB</strong>
+            <span>Fuente analitica</span>
+          </article>
+          <article>
+            <strong>KPIs</strong>
+            <span>Dashboard real</span>
+          </article>
+          <article>
+            <strong>Embed</strong>
+            <span>Vista interactiva</span>
+          </article>
+        </div>
+
+        <div class="chart-card metabase-card">
+          <div class="chart-header">
+            <span>Panel operativo en vivo</span>
+            <span class="chart-trend">Metabase</span>
+          </div>
+          <div class="metabase-frame" *ngIf="metabaseConfigured && metabaseEmbedUrl; else metabaseSetup">
+            <div class="metabase-frame-bar">
+              <span></span>
+              <span></span>
+              <span></span>
+              <small>Ingresos vs Costo vs Margen</small>
+            </div>
+            <iframe
+              class="metabase-iframe"
+              [src]="metabaseEmbedUrl"
+              title="Dashboard de Metabase"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+          <ng-template #metabaseSetup>
+            <div class="metabase-placeholder">
+              <p class="chart-note">
+                Configura la URL publica del dashboard en `src/app/core/config/metabase.config.ts`.
+              </p>
+              <ul>
+                <li>Levanta Metabase con Docker.</li>
+                <li>Crea un dashboard publicable.</li>
+                <li>Pega su URL publica en la config.</li>
+              </ul>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="panel-floating panel-floating-top">
+        <span class="floating-label">Estado</span>
+        <strong>{{ metabaseConfigured ? 'Datos reales' : 'Pendiente de Metabase' }}</strong>
+        <small>
+          {{ metabaseConfigured ? 'Dashboard embebido desde Metabase' : 'Falta configurar la URL publica' }}
+        </small>
+      </div>
+
+      <div class="panel-floating panel-floating-bottom">
+        <span class="floating-label">Backlog tecnico</span>
+        <div class="tag-row">
+          <span>Finanzas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats reveal reveal-delay-2" id="kpis" aria-label="Indicadores destacados">
+    <article>
+      <strong>9</strong>
+      <span>Microservicios conectados</span>
+    </article>
+    <article>
+      <strong>100%</strong>
+      <span>Actualizacion en tiempo real</span>
+    </article>
+    <article>
+      <strong>3</strong>
+      <span>Modulos principales</span>
+    </article>
+  </section>
+
+  <section class="modules-section" id="modulos">
+    <div class="section-heading reveal reveal-delay-1">
+      <span class="section-kicker">Modulos del sistema</span>
+      <h2>Una base moderna para operar con mas control</h2>
+      <p>
+        Cada modulo aporta una vista clara del negocio para que gerencia y equipos
+        operativos actuen con rapidez.
+      </p>
+    </div>
+
+    <div class="modules-grid">
+      <article class="module-card reveal reveal-delay-1">
+        <span class="module-icon module-icon-data"
+          ><img src="icons/database.png" alt="Gestion de datos"
+        /></span>
+        <h3>Gestion de datos</h3>
+        <p>
+          Consolida ventas, inventario, finanzas y clientes desde multiples fuentes
+          con una estructura confiable.
+        </p>
+        <div class="module-tags">
+          <span>Repository Pattern</span>
+          <span>ETL seguro</span>
+        </div>
+      </article>
+
+      <article class="module-card reveal reveal-delay-2">
+        <span class="module-icon module-icon-kpi"
+          ><img src="icons/bar-chart.png" alt="Gestion de KPIs"
+        /></span>
+        <h3>Gestion de KPIs</h3>
+        <p>
+          Define indicadores estrategicos, compara periodos y detecta desvios con
+          contexto operativo.
+        </p>
+        <div class="module-tags">
+          <span>Factory Method</span>
+          <span>Alertas</span>
+        </div>
+      </article>
+
+      <article class="module-card reveal reveal-delay-3">
+        <span class="module-icon module-icon-view"
+          ><img src="icons/dashboard.png" alt="Visualizacion"
+        /></span>
+        <h3>Visualizacion</h3>
+        <p>
+          Presenta reportes ejecutivos, paneles por area y lecturas accionables para
+          seguimiento diario.
+        </p>
+        <div class="module-tags">
+          <span>Circuit Breaker</span>
+          <span>Dashboards</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="cta-section reveal reveal-delay-3" id="cta">
+    <div>
+      <span class="section-kicker">Listo para escalar</span>
+      <h2>Tu operacion completa, en un solo lugar</h2>
+      <p>
+        Accede al panel de monitoreo y toma decisiones
+        basadas en datos confiables y actualizados.
+      </p>
+    </div>
+    <div class="cta-actions">
+      <a class="button button-primary" href="#inicio">Volver al inicio</a>
+      <a class="button button-secondary" routerLink="/registro">
+        Solicitar acceso
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>(c) 2026 Grupo Cordillera. Sistema interno con acceso restringido.</span>
+    <span>Conexion segura</span>
+  </footer>
+</main>

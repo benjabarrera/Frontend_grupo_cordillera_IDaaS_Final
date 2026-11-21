@@ -1,0 +1,250 @@
+<main class="dashboard-shell">
+  <div class="dashboard-glow glow-left" aria-hidden="true"></div>
+  <div class="dashboard-glow glow-right" aria-hidden="true"></div>
+
+  <header class="dashboard-header">
+    <div class="header-main">
+      <div>
+        <a class="brand-link" href="/">Grupo Cordillera</a>
+        <span class="eyebrow">Dashboard interno</span>
+        <h1>Bienvenido, {{ displayName() }}</h1>
+        <p>
+          Tu panel adapta las pestañas visibles segun el rol asignado por el backend.
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="notifications-wrapper">
+        <button
+          class="notification-button"
+          type="button"
+          (click)="toggleAlertsPanel()"
+          [attr.aria-expanded]="isAlertsOpen()"
+          aria-label="Abrir notificaciones"
+        >
+          <img src="icons/anillo-de-campana.png" alt="Notificaciones" class="notification-icon" />
+          <span class="notification-badge" *ngIf="notificationLabel()">{{ notificationLabel() }}</span>
+        </button>
+
+        <section class="notification-panel" *ngIf="isAlertsOpen()">
+          <div class="notification-panel-header">
+            <div>
+              <span class="section-kicker">Notificaciones</span>
+              <h2>Alertas activas</h2>
+            </div>
+
+            <button class="notification-close" type="button" (click)="closeAlertsPanel()">×</button>
+          </div>
+
+          <p class="feedback feedback-error" *ngIf="alertsError()">{{ alertsError() }}</p>
+
+          <div class="notification-summary">
+            <strong>{{ unreadAlertsCount() }}</strong>
+            <span>sin revisar</span>
+          </div>
+
+          <div class="notification-actions">
+            <button class="button button-secondary" type="button" (click)="markAllAlertsAsRead()" [disabled]="!alerts().length || isAlertsLoading()">
+              Marcar todas como leídas
+            </button>
+          </div>
+
+          <div class="notification-list" *ngIf="alerts().length; else emptyAlerts">
+            <button
+              class="notification-item"
+              type="button"
+              *ngFor="let alert of alerts()"
+              (click)="openAlert(alert)"
+            >
+              <span class="notification-item-icon">{{ alert.icono }}</span>
+              <span class="notification-item-copy">
+                <strong>{{ alert.tituloCompleto }}</strong>
+                <small>{{ alert.tiempoRelativo }}</small>
+              </span>
+            </button>
+          </div>
+
+          <ng-template #emptyAlerts>
+            <div class="empty-state">No hay alertas pendientes.</div>
+          </ng-template>
+        </section>
+      </div>
+
+      <div class="identity-card">
+        <span class="identity-label">Rol actual</span>
+        <strong>{{ displayRole() }}</strong>
+        <small>{{ displayEmail() }}</small>
+      </div>
+
+      <button class="button button-secondary" type="button" (click)="logout()">
+        Cerrar sesion
+      </button>
+    </div>
+  </header>
+
+  <button class="mobile-menu-btn" type="button" (click)="toggleMobileMenu()" aria-label="Alternar menú">
+    <svg *ngIf="!isMobileMenuOpen()" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    <svg *ngIf="isMobileMenuOpen()" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  </button>
+
+  <section class="dashboard-overview">
+    <article class="overview-card">
+      <span class="overview-label">Pestañas habilitadas</span>
+      <strong>{{ visibleTabs().length }}</strong>
+      <small>Visibles segun permisos del rol autenticado.</small>
+    </article>
+
+    <article class="overview-card">
+      <span class="overview-label">Acceso principal</span>
+      <strong>{{ activeTab() ? activeTab()!.label : 'Sin modulo' }}</strong>
+      <small>Se ajusta automaticamente segun tus permisos.</small>
+    </article>
+
+    <article class="overview-card">
+      <span class="overview-label">Sesion</span>
+      <strong>Activa</strong>
+    </article>
+  </section>
+
+  <section class="tabs-shell">
+    <div class="mobile-overlay" [class.overlay-open]="isMobileMenuOpen()" (click)="toggleMobileMenu()"></div>
+
+    <nav class="tabs-nav" [class.tabs-nav-open]="isMobileMenuOpen()" aria-label="Modulos del dashboard">
+      <button
+        *ngFor="let tab of visibleTabs()"
+        class="tab-button"
+        type="button"
+        [class.tab-button-active]="activeTab() ? activeTab()!.id === tab.id : false"
+        (click)="selectTab(tab.id)"
+      >
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-copy">
+          <strong>{{ tab.label }}</strong>
+          <small>{{ tab.metricLabel }}</small>
+        </span>
+      </button>
+    </nav>
+
+    <article class="tab-panel" *ngIf="activeTab() as tab">
+      <div class="tab-header">
+        <div>
+          <span class="eyebrow">Modulo habilitado</span>
+          <h2>{{ tab.label }}</h2>
+        </div>
+        <div class="metric-badge">
+          <span>{{ tab.metricLabel }}</span>
+          <strong>{{ tab.metricValue }}</strong>
+        </div>
+      </div>
+
+      <p class="tab-description">{{ tab.description }}</p>
+
+      <section class="summary-metrics" *ngIf="tab.id === 'resumen'">
+        <article class="summary-metric-card">
+          <div class="summary-metric-head">
+            <div>
+              <span class="summary-metric-label">Finanzas</span>
+              <h3>Ingresos, costos y margen</h3>
+            </div>
+            <span class="summary-metric-chip">Metabase</span>
+          </div>
+
+          <div class="summary-embed" *ngIf="financeMetabaseEmbedUrl && financeMetabaseConfigured; else financeFallback">
+            <iframe
+              class="summary-embed-frame"
+              [src]="financeMetabaseEmbedUrl"
+              title="Grafico de finanzas"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+
+          <ng-template #financeFallback>
+            <div class="summary-embed-placeholder">
+              <p>Configura la URL publica del grafico de finanzas en `metabase.config.ts`.</p>
+            </div>
+          </ng-template>
+        </article>
+
+        <article class="summary-metric-card">
+          <div class="summary-metric-head">
+            <div>
+              <span class="summary-metric-label">Ventas</span>
+              <h3>Ventas por dia</h3>
+            </div>
+            <span class="summary-metric-chip">Metabase</span>
+          </div>
+
+          <div class="summary-embed" *ngIf="salesMetabaseEmbedUrl && salesMetabaseConfigured; else salesFallback">
+            <iframe
+              class="summary-embed-frame"
+              [src]="salesMetabaseEmbedUrl"
+              title="Grafico de ventas por dia"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+
+          <ng-template #salesFallback>
+            <div class="summary-embed-placeholder">
+              <p>Configura la URL publica del grafico de ventas en `metabase.config.ts`.</p>
+            </div>
+          </ng-template>
+        </article>
+
+        <article class="summary-metric-card">
+          <div class="summary-metric-head">
+            <div>
+              <span class="summary-metric-label">Inventario</span>
+              <h3>Stock de productos</h3>
+            </div>
+            <span class="summary-metric-chip">Metabase</span>
+          </div>
+
+          <div class="summary-embed" *ngIf="stockMetabaseEmbedUrl && stockMetabaseConfigured; else stockFallback">
+            <iframe
+              class="summary-embed-frame"
+              [src]="stockMetabaseEmbedUrl"
+              title="Grafico de stock de productos"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+
+          <ng-template #stockFallback>
+            <div class="summary-embed-placeholder">
+              <p>Configura la URL publica del grafico de stock en `metabase.config.ts`.</p>
+            </div>
+          </ng-template>
+        </article>
+      </section>
+
+      <app-users-admin-panel *ngIf="tab.id === 'usuarios'" />
+      <app-inventory-panel *ngIf="tab.id === 'inventario'" />
+      <app-sales-panel *ngIf="tab.id === 'ventas'" />
+      <app-clients-panel *ngIf="tab.id === 'clientes'" />
+      <app-finances-panel *ngIf="tab.id === 'finanzas'" />
+      <app-alerts-panel *ngIf="tab.id === 'alertas'" />
+      <app-reports-panel *ngIf="tab.id === 'reportes'" />
+      <app-kpis-panel *ngIf="tab.id === 'kpis'" />
+
+      <section class="detail-grid" *ngIf="tab.id !== 'usuarios' && tab.id !== 'inventario' && tab.id !== 'ventas' && tab.id !== 'clientes' && tab.id !== 'finanzas' && tab.id !== 'alertas' && tab.id !== 'reportes' && tab.id !== 'kpis' && tab.id !== 'resumen'">
+        <article class="detail-card">
+          <span class="detail-label">Resumen</span>
+          <strong>{{ tab.summary }}</strong>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-label">¿Que falta?</span>
+          <strong>Conectar este modulo con su microservicio correspondiente.</strong>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-label">Permisos</span>
+          <strong>Visible solo para roles autorizados por el backend.</strong>
+        </article>
+      </section>
+    </article>
+  </section>
+</main>
